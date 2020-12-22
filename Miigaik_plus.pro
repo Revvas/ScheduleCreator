@@ -1,4 +1,4 @@
-QT       += core gui
+QT       += core gui sql
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -16,16 +16,41 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    auditorieswidget.cpp \
+    formchoice.cpp \
+    formchoicestring.cpp \
+    formsearch.cpp \
+    groupswidget.cpp \
+    grouptabledrop.cpp \
+    infobox.cpp \
     main.cpp \
-    mainwindow.cpp
+    mainwindow.cpp \
+    qtableviewdragdrop.cpp \
+    teacherswidget.cpp
 
 HEADERS += \
-    mainwindow.h
+    auditorieswidget.h \
+    formchoice.h \
+    formchoicestring.h \
+    formsearch.h \
+    groupswidget.h \
+    grouptabledrop.h \
+    infobox.h \
+    mainwindow.h \
+    qtableviewdragdrop.h \
+    teacherswidget.h
 
 FORMS += \
+    formchoice.ui \
+    formchoicestring.ui \
+    formsearch.ui \
     mainwindow.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
+
+DISTFILES +=
+
+RESOURCES +=
