@@ -13,7 +13,6 @@
 #include "auditorieswidget.h"
 #include "infobox.h"
 
-//#include "createboxes.cpp"
 
 
 QT_BEGIN_NAMESPACE
@@ -61,7 +60,6 @@ private:
     QList<QMdiSubWindow *>p_doc_aw;
 
 
-    //QSqlTableModel *_tablemodel;
     QSqlDatabase _database;
 
 };

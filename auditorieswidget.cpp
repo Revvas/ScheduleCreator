@@ -12,6 +12,7 @@ void AuditoriesWidget::searchClosed(QString filter){
 
 void AuditoriesWidget::Reload(){
     QString text = comboGroup->currentText();
+
     for(int i=0; i<6; i++){
         ModelAr[i]->submitAll();//ModelAr[i]
 
@@ -21,44 +22,9 @@ void AuditoriesWidget::Reload(){
             ModelAr[i]->setFilter(QString("Auditor = '%1' AND UpDown = '1' AND Day ='%2'").arg(text).arg(QsAr[i]));
 
         ModelAr[i]->select();
-
-
         TabAr[i]->setFixedHeight(TabAr[i]->rowHeight(0)*(TabAr[i]->model()->rowCount()+1));
-
-        ///////////////////////////////////////////////////////////////////
-        /*
-        // for(int i=0; i<6; i++)
-             if(ModelAr[i]->rowCount() < PARA_COUNT) {//empty table
-                 int ex = PARA_COUNT - ModelAr[i]->rowCount();
-
-                 qDebug() << "Here" << ModelAr[i]->rowCount() << ex;
-                 for(int j = 0; j<ex; j++) {
-                     ModelAr[i]->insertRow(ModelAr[i]->rowCount());
-
-                     int Curr_row = ModelAr[i]->rowCount()-1;
-
-                     QModelIndex _index = ModelAr[i]->index(Curr_row, 0);
-                     ModelAr[i]->setData(_index, j+1+PARA_COUNT-ex);
-
-                     _index = ModelAr[i]->index(Curr_row, 1);
-
-                     if (comboWeek->currentText()=="Верхняя")
-                         ModelAr[i]->setData(_index, 1);
-                     else ModelAr[i]->setData(_index, 0);
-
-                     _index = ModelAr[i]->index(Curr_row, 4);
-
-                     ModelAr[i]->setData(_index, comboGroup->currentText());
-
-                     _index = ModelAr[i]->index(Curr_row, 7);
-
-                     ModelAr[i]->setData(_index, QsAr[i]);
-
-                     ModelAr[i]->submitAll();
-                 }
-             }
-*/
     }
+
 }
 
 void AuditoriesWidget::searchClicked(bool checked){
@@ -99,8 +65,6 @@ AuditoriesWidget::AuditoriesWidget(QSqlDatabase database) : _database(database)
 
     connect(comboGroup, SIGNAL(currentTextChanged(QString)), this, SLOT(currentGroupChanged(QString)));
 
-
-
     //Week up/down
     QLabel *ql2 = new QLabel("Неделя");
     comboWeek = new QComboBox();
@@ -136,7 +100,7 @@ void AuditoriesWidget::AddTable(QGridLayout *qll, QSqlDatabase _database){
 
 
     auto glambda = [](GroupTableDrop *tab, QSqlTableModel *mod, QString str) {
-        mod->setTable("Schedule");
+        mod->setTable("GroupSchedule");
         mod->setEditStrategy(QSqlTableModel::OnFieldChange);
         mod->setFilter(QString("Day ='%1'").arg(str));
         mod->select();
@@ -159,8 +123,6 @@ void AuditoriesWidget::AddTable(QGridLayout *qll, QSqlDatabase _database){
         ModelAr[i]->setHeaderData(10, Qt::Horizontal, tr("Академическая специальность"));
 
 
-
-
         TabAr[i]->horizontalHeader()->setStretchLastSection(1);
         TabAr[i]->setSortingEnabled(1);
         TabAr[i]->resizeColumnsToContents();
@@ -174,18 +136,9 @@ void AuditoriesWidget::AddTable(QGridLayout *qll, QSqlDatabase _database){
         TabAr[i]->setColumnHidden(8, true);
 
 
-
-
         TabAr[i]->setEditTriggers(QAbstractItemView::NoEditTriggers);//not editable table
 
-
-
-        addButton[i] = new QPushButton("Добавить");
-
-        connect(addButton[i], SIGNAL(clicked()), this, SLOT(on_addButton_click()));
-
         qll->addWidget(LabAr[i], qll->rowCount()+1, 0);
-        qll->addWidget(addButton[i], qll->rowCount()-1, 1);
         qll->addWidget(TabAr[i], qll->rowCount()+1, 0, 1, 2);
 
       }
@@ -196,14 +149,7 @@ void AuditoriesWidget::on_addButton_click(){
     for(int i=0; i<6; i++){
        if(addButton[i] == QObject::sender()){
 
-           //QHeaderView* header = TabAr[i]->horizontalHeader();
-           //header->setSectionResizeMode(QHeaderView::Stretch);
-
-
-         //TabAr[i]->resize(TabAr[i]->width(), TabAr[i]->rowHeight(0)*TabAr[i]->model()->rowCount());
-         //TabAr[i]->repaint();
-
-        QModelIndex ind;
+          QModelIndex ind;
           ModelAr[i]->insertRow(ModelAr[i]->rowCount());
 
           ind = ModelAr[i]->index(ModelAr[i]->rowCount()-1, 0);
@@ -236,8 +182,6 @@ void AuditoriesWidget::on_addButton_click(){
 
            currentGroupChanged(comboGroup->currentText());
 
-
-           //TabAr[i]->setFixedHeight(TabAr[i]->rowHeight(0)*(TabAr[i]->model()->rowCount()+1));
        }
     }
 }
@@ -246,7 +190,7 @@ void AuditoriesWidget::on_addButton_click(){
 void AuditoriesWidget::currentGroupChanged(const QString &text){
     TableChanged();
     for(int i=0; i<6; i++){
-        ModelAr[i]->submitAll();//ModelAr[i]
+        ModelAr[i]->submitAll();
 
         if(comboWeek->currentText() == "Нижняя")
            ModelAr[i]->setFilter(QString("Auditor = '%1' AND UpDown = '0' AND Day ='%2'").arg(text).arg(QsAr[i]));
@@ -254,11 +198,7 @@ void AuditoriesWidget::currentGroupChanged(const QString &text){
             ModelAr[i]->setFilter(QString("Auditor = '%1' AND UpDown = '1' AND Day ='%2'").arg(text).arg(QsAr[i]));
 
         ModelAr[i]->select();
-        ///////////////////////////////////////////////////////////////////
-
-
     }
-
 }
 
 void AuditoriesWidget::currentWeakChanged(const QString &text){

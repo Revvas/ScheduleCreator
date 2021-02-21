@@ -12,7 +12,6 @@
 #include "grouptabledrop.h"
 #include "formsearch.h"
 
-//#include "pushashap.h"
 
 class GroupsWidget : public QWidget
 {
@@ -24,19 +23,15 @@ public:
     ~GroupsWidget();
     QGroupBox *groupWidget;
 
-    //QSqlTableModel *model;
-    //QModelIndex index;
 
     const int PARA_COUNT = 8;
      QSqlTableModel *GModel;
 
     void Reload();
 
-
-    //QSqlTableModel *MoModel;
     QSqlTableModel *ModelAr[6];
     GroupTableDrop *TabAr[6];
-    QString QsAr[6] = {"Понидельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота"};
+    QString QsAr[6] = {"Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота"};
 
     QComboBox *comboGroup;
     QComboBox *comboWeek;

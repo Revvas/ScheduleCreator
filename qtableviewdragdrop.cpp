@@ -9,8 +9,7 @@
 QTableViewDragDrop::QTableViewDragDrop(QWidget *parent)
     : QTableView (parent)
 {
-    //tab->horizontalHeader()->setStretchLastSection(1);
-    //tab->verticalHeader()->setStretchLastSection(1);
+
 }
 
 void QTableViewDragDrop::adaptColumn(){
@@ -20,9 +19,8 @@ void QTableViewDragDrop::adaptColumn(){
 
 }
 
-void QTableViewDragDrop::resizeEvent(QResizeEvent *event) {
-    //adaptColumn();
-
+void QTableViewDragDrop::resizeEvent(QResizeEvent *event)
+{
     QTableView::resizeEvent(event);
 }
 
@@ -40,7 +38,6 @@ void QTableViewDragDrop::dragMoveEvent(QDragMoveEvent *event)
 void QTableViewDragDrop::mousePressEvent(QMouseEvent *event)
 {
 
-
     if (event->button() == Qt::LeftButton) {
 
 
@@ -49,19 +46,10 @@ void QTableViewDragDrop::mousePressEvent(QMouseEvent *event)
 
             QModelIndex ind = this->indexAt(event->pos());
 
-            //this->model()->data(ind);
-
-            //QByteArray Delement = this->model()->data(ind);
-            //qDebug() << this->model()->data(ind).toString();
-
             QString col = this->model()->headerData(ind.column(), Qt::Horizontal).toString();
-
-
 
             mimeData->setText(col +"#" + this->model()->data(ind).toString());
 
-            //mimeData->setData()
-            //mimeData->setData("plain/text", Delement);
             drag->setMimeData(mimeData);
 
             Qt::DropAction dropAction = drag->exec();
@@ -69,44 +57,19 @@ void QTableViewDragDrop::mousePressEvent(QMouseEvent *event)
 
     event->accept();
 
-    //qDebug() << "hello";
-
     QTableView::mousePressEvent(event);
 }
 
 void QTableViewDragDrop::dragEnterEvent(QDragEnterEvent *event)
 {
-    /*
-    if (event->mimeData()->hasFormat("plain/text"))//("application/x-qstandarditemmodeldatalist"))
-        event->acceptProposedAction();
-*/
     event->acceptProposedAction();
-    //qDebug() << event->mimeData()->formats()  <<"dragenter";
-    //event->accept();
-    //QTableView::dragEnterEvent(event);
 }
 
 void QTableViewDragDrop::dropEvent(QDropEvent *event)
 {
-    /*
-    QByteArray encoded = event->mimeData()->data("plain/text");//("application/x-qabstractitemmodeldatalist");
-    QDataStream stream(&encoded, QIODevice::ReadOnly);
-    QString Delement;
-
-    while (!stream.atEnd())
-    {
-        int row, col;
-        QMap<int,  QVariant> roleDataMap;
-        stream >> row >> col >> roleDataMap;
-        qDebug() << roleDataMap;
-
-        Delement = roleDataMap[0].toString();
-    }
-    */
     QString Delement = event->mimeData()->text();
 
     QModelIndex ind = this->indexAt(event->pos());
-    //qDebug() << ind << "ind";
 
     this->model()->setData(ind, Delement);
 

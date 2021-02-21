@@ -12,8 +12,6 @@ class QTableViewDragDrop : public QTableView
 public:
     QTableViewDragDrop(QWidget *parent = 0);
     void mousePressEvent(QMouseEvent * event);
-    //void mouseMoveEvent(QMouseEvent * event);
-    //void keyPressEvent(QKeyEvent *event);
     void dropEvent(QDropEvent * event);
     Qt::DropActions supportedDropActions() const;
     void dragEnterEvent(QDragEnterEvent *event);

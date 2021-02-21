@@ -22,9 +22,6 @@ public:
     ~TeachersWidget();
     QGroupBox *teacherWidget;
 
-    //QSqlTableModel *model;
-    //QModelIndex index;
-
     const int PARA_COUNT = 8;
 
     void MakeGroup(QString group_name);
@@ -33,10 +30,9 @@ public:
 
     void Reload();
 
-    //QSqlTableModel *MoModel;
     QSqlTableModel *ModelAr[6];
     GroupTableDrop *TabAr[6];
-    QString QsAr[6] = {"Понидельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота"};
+    QString QsAr[6] = {"Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота"};
 
     QComboBox *comboGroup;
     QComboBox *comboWeek;

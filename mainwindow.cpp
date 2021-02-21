@@ -24,7 +24,6 @@ MainWindow::MainWindow(QWidget *parent)
     _database = QSqlDatabase::addDatabase("QSQLITE");
 
     _database.setDatabaseName(file->getOpenFileName());
-    //if(!subjectBD.open()) this->close();
     qDebug() << "Open?" << _database.open();
 
 
@@ -40,14 +39,9 @@ void MainWindow::CreateBox(QGroupBox *qgb){
     QDockWidget *doc = new QDockWidget("Document");
 
     doc->setWidget(qgb);
-   // doc->setWindowFlag(Qt::SubWindow);
     QMdiSubWindow *sw = ui->mdiArea->addSubWindow(doc);
     sw->resize(qgb->size());
     sw->show();
-
-    //p_doc.append(doc);
-
-    //ui->gridL->addWidget(qgb, 0, ui->gridL->columnCount()+1);
 
 
 }
@@ -55,19 +49,14 @@ void MainWindow::CreateBox(QGroupBox *qgb){
 void MainWindow::CreateGroupsScheduleBox(){
 
     GroupsWidget *gw = new GroupsWidget(_database);
-    //CreateBox(gw->groupWidget);
 
     p_gw.append(gw);
-    //p_gw[0]->Reload();
 
     connect(gw, SIGNAL(TableChanged()), this, SLOT(on_reloadTable()));
 
     QScrollArea *qsoo = new QScrollArea();
-    //QDockWidget *doc = new QDockWidget("Document");
-    //doc->setWidget(qsoo);
     qsoo->setWidget(gw->groupWidget);
     qsoo->setWidgetResizable(true);
-    //doc->setWindowFlag(Qt::SubWindow);
     QMdiSubWindow *sw = ui->mdiArea->addSubWindow(qsoo);
     sw->resize(gw->groupWidget->size().width(), ui->mdiArea->size().height()-20);
     sw->show();
@@ -78,18 +67,14 @@ void MainWindow::CreateGroupsScheduleBox(){
 
 void MainWindow::CreateTeachersScheduleBox(){
     TeachersWidget *tw = new TeachersWidget(_database);
-    //CreateBox(tw->teacherWidget);
     p_tw.append(tw);
 
     connect(tw, SIGNAL(TableChanged()), this, SLOT(on_reloadTable()));
 
 
     QScrollArea *qsoo = new QScrollArea();
-    //QDockWidget *doc = new QDockWidget("Document");
-    //doc->setWidget(qsoo);
     qsoo->setWidget(tw->teacherWidget);
     qsoo->setWidgetResizable(true);
-   // doc->setWindowFlag(Qt::SubWindow);
     QMdiSubWindow *sw = ui->mdiArea->addSubWindow(qsoo);
     sw->resize(tw->teacherWidget->size());
     sw->show();
@@ -99,24 +84,19 @@ void MainWindow::CreateTeachersScheduleBox(){
 }
 void MainWindow::CreateAuditoriesScheduleBox(){
     AuditoriesWidget *aw = new AuditoriesWidget(_database);
-    //CreateBox(aw->auditoriesWidget);
     p_aw.append(aw);
 
     connect(aw, SIGNAL(TableChanged()), this, SLOT(on_reloadTable()));
 
     QScrollArea *qsoo = new QScrollArea();
-    //QDockWidget *doc = new QDockWidget("Document");
-    //doc->setWidget(qsoo);
     qsoo->setWidget(aw->auditoriesWidget);
     qsoo->setWidgetResizable(true);
 
-   // doc->setWindowFlag(Qt::SubWindow);
     QMdiSubWindow *sw = ui->mdiArea->addSubWindow(qsoo);
     sw->resize(aw->auditoriesWidget->size());
     sw->show();
 
     p_doc_aw.append(sw);
-    //https://www.youtube.com/watch?v=Aiay8I5IPB8&list=PLn4GvABOzCQursVQ7qMU9CkNaKz4RgrVM
 }
 
 void MainWindow::on_reloadTable(){
@@ -140,7 +120,6 @@ void MainWindow::CreateGroupsBox(){
     QSqlTableModel *GroupModel = new QSqlTableModel(0, _database);
     GroupModel->setTable("Groupes");
     GroupModel->select();
-    //GroupModel->removeColumn(0); // don't show the ID
     GroupModel->setHeaderData(1, Qt::Horizontal, tr("Группа"));
     GroupModel->setHeaderData(2, Qt::Horizontal, tr("Кафедра"));
 

@@ -12,8 +12,6 @@ FormChoice::FormChoice(QSqlTableModel *_model,QWidget *parent) :
     ui->tableView->setColumnHidden(0, true);
     ui->tableView->horizontalHeader()->setVisible(false);
 
-    //this->resize(minimumSizeHint());
-   //this->adjustSize();
 }
 
 FormChoice::~FormChoice()
@@ -27,8 +25,6 @@ void FormChoice::on_tableView_clicked(const QModelIndex &index)
     QModelIndex ind = model->index(index.row(), 0);
     QString id = model->data(ind, 0).toString();
 
-
-    //model->setFilter(index);
     model->setFilter(QString("id = '%1'").arg(id));
 
     closed(id);

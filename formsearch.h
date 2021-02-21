@@ -20,8 +20,6 @@ class FormSearch : public QWidget
 
 public:
     QSqlTableModel *model;
-    //QTableView *view;
-    //QString s;
 
     explicit FormSearch(QSqlTableModel *_model,QWidget *parent = nullptr);
     ~FormSearch();

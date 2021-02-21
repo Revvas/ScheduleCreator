@@ -16,8 +16,6 @@
 #include <QMessageBox>
 #include <QSqlDatabase>
 
-//#include "Soul.cpp"
-//#include "formsearch.h"
 #include "formchoice.h"
 #include "formchoicestring.h"
 
@@ -56,15 +54,12 @@ protected:
     bool CellCheck = 0;
     void keyReleaseEvent(QKeyEvent *);
 
-//protected slots:
-    //void rowCountChanged(int oldCount, int newCount);
 
 private slots:
     void searchClosed(QString string);
 
 signals:
     void CheckError(QDropEvent *event);
-    //void rowCountChanged(int,int);
 };
 
 #endif // GROUPTABLEDROP_H

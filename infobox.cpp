@@ -11,7 +11,6 @@ InfoBox::InfoBox(QString WidgetName, QSqlTableModel *_model, QString _ColumnName
 
     textSearch = new QTextEdit();
 
-    //textSearch->setMaximumWidth(30);
     textSearch->setMaximumHeight(30);
 
 
@@ -45,8 +44,6 @@ InfoBox::InfoBox(QString WidgetName, QSqlTableModel *_model, QString _ColumnName
 
         tab->setSortingEnabled(1);
 
-        //tab->horizontalHeader()->setStretchLastSection(1);
-        //tab->verticalHeader()->setStretchLastSection(1);
         tab->resizeColumnsToContents();
 
 
@@ -72,52 +69,13 @@ void InfoBox::on_deleteButon_clicked(){
     QModelIndex ind = tab->currentIndex();
     model->removeRow(ind.row());
     on_textEdit_textChanged();
-    /*
-    QModelIndexList selection = tab->selectionModel()->selectedRows();
-    for(int i=0; i< selection.count(); i++)
-    {
-        QModelIndex index = selection.at(i);
-        model->removeRow(index.row());
-        on_textEdit_textChanged();
-    }
-    */
 }
 
 
 void InfoBox::on_textEdit_textChanged(){
 
     QString in_str = textSearch->toPlainText();
-
-    //model->sort(0, Qt::SortOrder)
-
-
-
     QString curr_col = model->headerData(1, Qt::Horizontal, Qt::DisplayRole).toString();
-    //QModelIndex ind = model->index(0, 1);
-
-
-    //QString curr_col = model.col
-    //QString curr_col = model->headerData(ind.column(), Qt::Horizontal).toString();
-
     //model.fil
     model->setFilter(QString("%1 like ('\%%2\%')").arg(ColumnName).arg(in_str));
-    /*
-
-    QStringList stringList;
-       for(int i = 0; i < model->rowCount(); i++)
-        stringList.append( model->record(i).value(0).toString() );
-
-    QStringList result;
-
-    for(int i=0; i<stringList.length(); i++){
-        if(stringList[i].contains(in_str))
-            result.append(stringList[i]);
-    }
-
-
-    QStringListModel *strmo = new QStringListModel(result);
-    //tbv = new QTableView();
-    tab->setModel(strmo);
-    //tab->setColumnHidden(0, false);
-*/
 }

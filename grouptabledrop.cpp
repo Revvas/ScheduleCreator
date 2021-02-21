@@ -6,20 +6,14 @@ GroupTableDrop::GroupTableDrop(QComboBox *comboGroup_p, QComboBox *comboWeek_p,
 {
     this->setDragEnabled(false);
     this->setDragDropMode(QAbstractItemView::DropOnly);
-    // this->setSortingEnabled(false);
-    //this.
-    //this->model()->sort(0,Qt::AscendingOrder);
 
     this->sortByColumn(0, Qt::AscendingOrder);
-    //this->horizontalHeader()
-    // this->horizontalHeader()->setResizeMode(QHeaderView::ResizeToContents);
 
 
 }
 
 void GroupTableDrop::dragMoveEvent(QDragMoveEvent *event)
 {
-    //event->accept();
     event->acceptProposedAction();
 }
 
@@ -39,9 +33,6 @@ void GroupTableDrop::dropEvent(QDropEvent *event)
     QString Delement = event->mimeData()->text();
     QModelIndex ind = this->indexAt(event->pos());
 
-    //
-
-    //CheckError(event);
 
     QString drag_col_ = "";
     QString curr_col = this->model()->headerData(ind.column(), Qt::Horizontal).toString();
@@ -67,7 +58,6 @@ void GroupTableDrop::dropEvent(QDropEvent *event)
 
         QString curr_text = this->model()->data(ind, 0).toString();
 
-        //if(curr_text != Delement ){
         qDebug() <<  curr_text<< "!=" << Delement << "index" << ind;
 
         if (curr_col == "Группа" && curr_text!=""){
@@ -84,25 +74,21 @@ void GroupTableDrop::dropEvent(QDropEvent *event)
         QString new_text = Delement;
 
         if(curr_col!="Тип пары" && curr_col!="Кафедра"&& curr_col!="Академическая специальность")
-            //if (){
-            Soul(id, curr_col, new_text);
-        //this->model()->setData(ind, Delement);
+            if(TableName=="GroupSchedule"){
+                this->model()->setData(ind, Delement);
+                Soul(id, curr_col, new_text);
+            }
         comboGroup->currentTextChanged(comboGroup->currentText());
-        // }
-
-        //}
 
 
 
     }
 
     event->acceptProposedAction();
-    //event->accept();
-    //QTableView::dropEvent(event);
 }
 
 void GroupTableDrop::keyReleaseEvent(QKeyEvent * event){
-    if(event->key() == Qt::Key_Return)
+    if(event->key() == Qt::Key_Return && TableName=="GroupSchedule")
     {
         if(CellCheck){
             QModelIndex ind = this->selectionModel()->currentIndex();
@@ -114,11 +100,9 @@ void GroupTableDrop::keyReleaseEvent(QKeyEvent * event){
             ind = this->model()->index(ind.row(), 8);
             int id = this->model()->data(ind, 0).toInt();
 
-            //if(old_text!=new_text){
             if(new_text!=""){
                 Soul( id, curr_col, new_text);
             }else{
-                qDebug()<<"kek"<< (new_text=="");
                 Soul_Separate(id, curr_col, new_text);
             }
             comboGroup->currentTextChanged(comboGroup->currentText());
@@ -135,28 +119,27 @@ void GroupTableDrop::keyReleaseEvent(QKeyEvent * event){
             QString curr_col = this->model()->headerData(ind.column(), Qt::Horizontal).toString();
 
             if(curr_col!="Тип пары" && curr_col!="Кафедра"&& curr_col!="Академическая специальность"){
-                this->edit(ind);
-                CellCheck = 1;
+                if(TableName=="GroupSchedule"){
+                    this->edit(ind);
+                    CellCheck = 1;
+                }
             }
 
         }
     }
     if(event->key() == Qt::Key_Delete)
     {
-        QModelIndexList selection = this->selectionModel()->selectedRows();
-        for(int i=0; i< selection.count(); i++)
-        {
-            QModelIndex index = selection.at(i);
-            this->model()->removeRow(index.row());
-            comboGroup->currentTextChanged(comboGroup->currentText());
+        if(TableName=="GroupSchedule"){
+            QModelIndexList selection = this->selectionModel()->selectedRows();
+            for(int i=0; i< selection.count(); i++)
+            {
+                QModelIndex index = selection.at(i);
+                this->model()->removeRow(index.row());
+                comboGroup->currentTextChanged(comboGroup->currentText());
+            }
         }
     }
 }
-
-
-
-
-
 
 
 void GroupTableDrop::Soul_Separate(int id, QString column, QString newText){
@@ -166,54 +149,42 @@ void GroupTableDrop::Soul_Separate(int id, QString column, QString newText){
     CurrentTableModel->select();
 
 
+    if(column=="Аудитория"){
 
-    if(column == "Предмет"){
         CurrentTableModel->setFilter(QString("id = '%1'").arg(id));//Type
+        CurrentTableModel->setData(CurrentTableModel->index(0,5), newText);
+        CurrentTableModel->submitAll();
 
-        CurrentTableModel->setData(CurrentTableModel->index( 0 , 9), newText);
-        CurrentTableModel->setData(CurrentTableModel->index( 0 , 10), newText);
-        CurrentTableModel->setData(CurrentTableModel->index( 0 , 2), newText);
-        if (CurrentTableModel->data(CurrentTableModel->index( 0 , 5), 0).toString()==""){
-            CurrentTableModel->setData(CurrentTableModel->index( 0 , 3), newText);
-        }
-        if (CurrentTableModel->data(CurrentTableModel->index( 0 , 4), 0).toString()!="" and
-                CurrentTableModel->data(CurrentTableModel->index( 0 , 5), 0).toString()!=""){
+        QString Subject = CurrentTableModel->data(CurrentTableModel->index( 0 , 2), 0).toString();
 
+        if(Subject==""){
+            CurrentTableModel->setData(CurrentTableModel->index(0,3), newText);
             CurrentTableModel->submitAll();
             return;
-        }else CurrentTableModel->submitAll();
-
-
-
-        //Update
-        QSqlTableModel *GroupScheduleModel = Soul_Relationship(CurrentTableModel);
-
-        GroupScheduleModel->setFilter("Para = '" + CurrentTableModel->data(CurrentTableModel->index( 0 , 0), 0).toString() +
-                                      "' and UpDown = '" + CurrentTableModel->data(CurrentTableModel->index( 0 , 1), 0).toString() +
-                                      "' and Teacher = '" + CurrentTableModel->data(CurrentTableModel->index( 0 , 4), 0).toString() +
-                                      "' and Auditor = '" + CurrentTableModel->data(CurrentTableModel->index( 0 , 5), 0).toString() +
-                                      "' and Day = '" + CurrentTableModel->data(CurrentTableModel->index( 0 , 7), 0).toString() +
-                                      "' and Groupe like ('%" + CurrentTableModel->data(CurrentTableModel->index( 0 , 6), 0).toString() +
-                                      "%')");
-
-
-        if(GroupScheduleModel->rowCount()==0){
-            return;
-        }else{
-
-            GroupScheduleModel->setData(GroupScheduleModel->index( 0 , 9), newText);
-            GroupScheduleModel->setData(GroupScheduleModel->index( 0 , 10),newText);
-            GroupScheduleModel->setData(GroupScheduleModel->index( 0 , 2), newText);
-            if (GroupScheduleModel->data(GroupScheduleModel->index( 0 , 5), 0).toString()==""){
-                GroupScheduleModel->setData(GroupScheduleModel->index( 0 , 3), newText);
-            }
-
-            GroupScheduleModel->submitAll();
-            if(GroupScheduleModel->rowCount())
-                qDebug() << "GroupScheduleModel->rowCount() =" << GroupScheduleModel->rowCount();
         }
+        return;
 
+    }
+    if(column=="Предмет"){
 
+        CurrentTableModel->setFilter(QString("id = '%1'").arg(id));//Type
+        CurrentTableModel->setData(CurrentTableModel->index(0,3), newText);
+        CurrentTableModel->submitAll();
+
+        QString Auditor = CurrentTableModel->data(CurrentTableModel->index( 0 , 5), 0).toString();
+
+        CurrentTableModel->setData(CurrentTableModel->index( 0 , 9), "");
+        CurrentTableModel->setData(CurrentTableModel->index( 0 , 10), "");
+        CurrentTableModel->submitAll();
+        return;
+        if(Auditor==""){
+
+            CurrentTableModel->setData(CurrentTableModel->index(0,3), newText);
+            CurrentTableModel->submitAll();
+            return;
+
+        }
+        return;
     }
 
 
@@ -222,9 +193,8 @@ void GroupTableDrop::Soul_Separate(int id, QString column, QString newText){
 
 
 bool GroupTableDrop::Soul(int id, QString column, QString newText){//0 new_text = old_text
-    qDebug() << "Made with Soul @Михаил";
-    //database
-    //this->model().
+
+
     QSqlTableModel *CurrentTableModel = new QSqlTableModel(0, database);
     CurrentTableModel->setTable(TableName);
     CurrentTableModel->select();
@@ -244,250 +214,326 @@ bool GroupTableDrop::Soul(int id, QString column, QString newText){//0 new_text 
     InfoSubject->select();
 
 
+    if(column=="Аудитория"){
+
+        qDebug() << "catch me -3";
+        CurrentTableModel->setFilter(QString("id = '%1'").arg(id));//Type
+
+        CurrentTableModel->setData(CurrentTableModel->index(0,5), newText);
+        CurrentTableModel->submitAll();
+
+        InfoAuditor->setFilter(QString("Number = '%1'").arg(newText));
+        if (InfoSubject->rowCount()==0) {
+            QMessageBox msg;
+            msg.warning(this, "Ошибка", "Данной аудитории нет в базе данных");
+            CurrentTableModel->setData(CurrentTableModel->index(0,5), old_text);
+            CurrentTableModel->submitAll();
+            return 0;
+
+            qDebug() << "catch me -2";
+        }
+
+        QSqlTableModel *OtherModel = new QSqlTableModel(0, database);
+        OtherModel->setTable(TableName);
+        OtherModel->select();
+
+        OtherModel->setFilter("Para = '" + CurrentTableModel->data(CurrentTableModel->index( 0 , 0), 0).toString() +
+                                                  "' and UpDown = '" + CurrentTableModel->data(CurrentTableModel->index( 0 , 1), 0).toString() +
+                                                  "' and Auditor = '" + CurrentTableModel->data(CurrentTableModel->index( 0 , 5), 0).toString() +
+                                                  "' and Day = '" + CurrentTableModel->data(CurrentTableModel->index( 0 , 7), 0).toString() +
+                                                  "'");
 
 
+        qDebug() << "catch me -1";
+        if(OtherModel->rowCount()>1){
+            qDebug() << "catch me 0";
+            QMessageBox msg;
+            msg.warning(this, "Ошибка", "Данная аудитория занята");
+            CurrentTableModel->setData(CurrentTableModel->index(0,5), old_text);
+            CurrentTableModel->submitAll();
+            return 0;
+        }else{
+            QString Type = CurrentTableModel->data(CurrentTableModel->index( 0 , 3), 0).toString();
+            QString Subject = CurrentTableModel->data(CurrentTableModel->index( 0 , 2), 0).toString();
+            QString OtherType =  InfoAuditor->data(InfoAuditor->index(0,2), 0).toString();
+
+                qDebug() << "catch me 1";
+            if(Subject=="" or OtherType == "Общая"){
+                CurrentTableModel->setData(CurrentTableModel->index(0,3), OtherType);
+                CurrentTableModel->submitAll();
+                qDebug() << "catch me 2";
+                return 1;
+            }else if(Type != OtherType){
+                QMessageBox msg;
+                msg.warning(this, "Ошибка", "В " +CurrentTableModel->data(CurrentTableModel->index( 0 , 5), 0).toString()
+                                        + " аудитории тип пары не " + Type);
+                CurrentTableModel->setData(CurrentTableModel->index(0,5), old_text);
+                CurrentTableModel->submitAll();
+                return 0;
+            }else{
+                return 1;
+            }
+        }
+
+    }
     if(column == "Предмет"){
+
+        qDebug() << "catch me -3";
+        CurrentTableModel->setFilter(QString("id = '%1'").arg(id));//Type
+
+        CurrentTableModel->setData(CurrentTableModel->index(0,2), newText);
+        CurrentTableModel->submitAll();
+
+
         //Select info
         InfoSubject->setFilter(QString("Subject = '%1'").arg(newText));
         if(InfoSubject->rowCount() > 1){
-            //cell = QMessageBox !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-
             FormChoice *fs = new FormChoice(InfoSubject);
             fs->show();
             connect(fs, SIGNAL(closed(QString)), this, SLOT(searchClosed(QString)));
             QEventLoop SignalWaitLoop;
             connect(fs, SIGNAL(closed(QString)), &SignalWaitLoop, SLOT(quit()));
             SignalWaitLoop.exec();
-
-
             qDebug() << searchResult;
 
         }
         else if (InfoSubject->rowCount()==0) {
             QMessageBox msg;
             msg.warning(this, "Ошибка", "Данного предмета нет в базе данных");
+            CurrentTableModel->setData(CurrentTableModel->index(0,2), old_text);
+            CurrentTableModel->submitAll();
             return 0;
         }
-
 
         //Compare info
         QString typeInfo = InfoSubject->data(InfoSubject->index(0, 2), 0).toString();
         QString kafedraInfo = InfoSubject->data(InfoSubject->index(0, 3), 0).toString();
         QString academSpecInfo = InfoSubject->data(InfoSubject->index(0, 4), 0).toString();
 
-        CurrentTableModel->setFilter(QString("id = '%1'").arg(id));//Type
-
         QString typeCurrent = CurrentTableModel->data(CurrentTableModel->index( 0 , 3), 0).toString();
 
-        if ( ""==CurrentTableModel->data(CurrentTableModel->index( 0 , 5), 0).toString() ||
-             (""!=CurrentTableModel->data(CurrentTableModel->index( 0 , 5), 0).toString() &&
-              (typeInfo == typeCurrent or typeCurrent==""))){
+        QString Auditor=  CurrentTableModel->data(CurrentTableModel->index( 0 , 5), 0).toString();
 
+        if(Auditor == "" or typeCurrent=="Общая" or typeInfo==typeCurrent){
             CurrentTableModel->setData(CurrentTableModel->index( 0 , 2), newText);
             CurrentTableModel->setData(CurrentTableModel->index( 0 , 3), typeInfo);
             CurrentTableModel->setData(CurrentTableModel->index( 0 , 9), kafedraInfo);
             CurrentTableModel->setData(CurrentTableModel->index( 0 , 10), academSpecInfo);
-
             CurrentTableModel->submitAll();
-
-            //Update
-            QSqlTableModel *GroupScheduleModel = Soul_Relationship(CurrentTableModel);
-            if(GroupScheduleModel == nullptr) return 1;
-
-
-            qDebug() <<"update_0" << CurrentTableModel->data(CurrentTableModel->index( 0 , 0), 0).toString();
-            qDebug() <<"update_0_0" << GroupScheduleModel->data(GroupScheduleModel->index( 0 , 0), 0).toString();
-            //GroupScheduleModel->setFilter("Para = ''");
-
-
-
-            GroupScheduleModel->setFilter("Para = '" + CurrentTableModel->data(CurrentTableModel->index( 0 , 0), 0).toString() +
-                                          "' and UpDown = '" + CurrentTableModel->data(CurrentTableModel->index( 0 , 1), 0).toString() +
-                                          "' and Teacher = '" + CurrentTableModel->data(CurrentTableModel->index( 0 , 4), 0).toString() +
-                                          "' and Auditor = '" + CurrentTableModel->data(CurrentTableModel->index( 0 , 5), 0).toString() +
-                                          "' and Day = '" + CurrentTableModel->data(CurrentTableModel->index( 0 , 7), 0).toString() +
-                                          "' and Groupe like ('%" + CurrentTableModel->data(CurrentTableModel->index( 0 , 6), 0).toString() +
-                                          "%')");
-
-
-            qDebug() << "update_1";
-            if(GroupScheduleModel->rowCount()==0){
-                return 1;
-            }else{
-                qDebug() << "update_2";
-                GroupScheduleModel->setData(CurrentTableModel->index( 0 , 2), newText);
-                GroupScheduleModel->setData(CurrentTableModel->index( 0 , 3), typeInfo);
-                GroupScheduleModel->setData(CurrentTableModel->index( 0 , 9), kafedraInfo);
-                GroupScheduleModel->setData(CurrentTableModel->index( 0 , 10), academSpecInfo);
-
-                GroupScheduleModel->submitAll();
-                if(GroupScheduleModel->rowCount())
-                    qDebug() << "GroupScheduleModel->rowCount() =" << GroupScheduleModel->rowCount();
-            }
-            qDebug() << "update_3";
-
-
-        }
-        else {//Not Update
+            return 1;
+        }else if (typeCurrent!=typeInfo){
             QMessageBox msg;
             msg.warning(this, "Ошибка", "В " +CurrentTableModel->data(CurrentTableModel->index( 0 , 5), 0).toString()
                         + " аудитории тип пары не " + typeInfo);//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
             CurrentTableModel->setData(CurrentTableModel->index( 0 , 2), old_text);
             CurrentTableModel->submitAll();
             return 0;
-        }
-    }// end Subject
-    if(column == "Преподаватель"){
-        InfoTeacher->setFilter(QString("Name = '%1'").arg(newText));
-        if(InfoTeacher->rowCount() > 1){
-            //cell = QMessageBox !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-            FormChoice *fs = new FormChoice(InfoTeacher);
-            fs->show();
-            connect(fs, SIGNAL(closed(QString)), this, SLOT(searchClosed(QString)));
-            QEventLoop SignalWaitLoop;
-            connect(fs, SIGNAL(closed(QString)), &SignalWaitLoop, SLOT(quit()));
-            SignalWaitLoop.exec();
-
-
-            qDebug() << searchResult;
-
-        }
-        else if (InfoTeacher->rowCount()==0) {
-            QMessageBox msg;
-            msg.warning(this, "Ошибка", "Данного преподавателя нет в базе данных");
+        }else{
             return 0;
         }
 
+
+    }
+
+    if(column == "Преподаватель"){
+        qDebug() << "catch me -3";
         CurrentTableModel->setFilter(QString("id = '%1'").arg(id));//Type
 
-        QSqlTableModel *GroupScheduleModel = Soul_Relationship(CurrentTableModel);
-        if(GroupScheduleModel == nullptr) return 1;
+        CurrentTableModel->setData(CurrentTableModel->index(0,4), newText);
+        CurrentTableModel->submitAll();
 
-        GroupScheduleModel->setFilter("Para = '" + CurrentTableModel->data(CurrentTableModel->index( 0 , 0), 0).toString() +
-                                      "' and UpDown = '" + CurrentTableModel->data(CurrentTableModel->index( 0 , 1), 0).toString() +
-                                      "' and Teacher = '" + newText +
-                                      "' and Day = '" + CurrentTableModel->data(CurrentTableModel->index( 0 , 7), 0).toString());
+        InfoTeacher->setFilter(QString("Name = '%1'").arg(newText));
+        if (InfoTeacher->rowCount()==0) {
+            QMessageBox msg;
+            msg.warning(this, "Ошибка", "Данного преподавателя нет в базе данных");
+            CurrentTableModel->setData(CurrentTableModel->index(0,4), old_text);
+            CurrentTableModel->submitAll();
+            return 0;
+        }
 
-        if(GroupScheduleModel->rowCount()==1){
+       QSqlTableModel *OtherModel = new QSqlTableModel(0, database);
+       OtherModel->setTable(TableName);
+       OtherModel->select();
+
+       QString Auditory = CurrentTableModel->data(CurrentTableModel->index(0, 5),0).toString();
+       QString Subject = CurrentTableModel->data(CurrentTableModel->index(0, 2),0).toString();
+
+       OtherModel->setFilter("Para = '" + CurrentTableModel->data(CurrentTableModel->index( 0 , 0), 0).toString() +
+                             "' and UpDown = '" + CurrentTableModel->data(CurrentTableModel->index( 0 , 1), 0).toString() +
+                             "' and Teacher = '" + newText +
+                             "' and Day = '" + CurrentTableModel->data(CurrentTableModel->index( 0 , 7), 0).toString()
+                             +"'");
+
+       if(OtherModel->rowCount()>1){
+           //обеденить или отменить
+           QTableView *qtw= new QTableView();
+           qtw->setModel(OtherModel);
+           qtw->show();
+
+           QMessageBox::StandardButton reply;
+           reply = QMessageBox::question(this, "Внимание", "Обьеденить пары, указанные в открывшейся таблице?",
+                                         QMessageBox::Yes|QMessageBox::No);
+           if (reply == QMessageBox::Yes) {
+               OtherModel->setFilter("Para = '" + CurrentTableModel->data(CurrentTableModel->index( 0 , 0), 0).toString() +
+                                     "' and UpDown = '" + CurrentTableModel->data(CurrentTableModel->index( 0 , 1), 0).toString() +
+                                     "' and Teacher = '" + newText +
+                                     "' and Day = '" + CurrentTableModel->data(CurrentTableModel->index( 0 , 7), 0).toString()
+                                     +"' and id !='"+id+"'");
+
+               CurrentTableModel->setData(CurrentTableModel->index(0,2), OtherModel->data(OtherModel->index(0,2),0).toString());
+               CurrentTableModel->setData(CurrentTableModel->index(0,3), OtherModel->data(OtherModel->index(0,3),0).toString());
+               CurrentTableModel->setData(CurrentTableModel->index(0,5), OtherModel->data(OtherModel->index(0,5),0).toString());
+               CurrentTableModel->setData(CurrentTableModel->index(0,9), OtherModel->data(OtherModel->index(0,9),0).toString());
+               CurrentTableModel->setData(CurrentTableModel->index(0,10), OtherModel->data(OtherModel->index(0,10),0).toString());
+               CurrentTableModel->setData(CurrentTableModel->index(0,4), OtherModel->data(OtherModel->index(0,4),0).toString());
+               CurrentTableModel->submitAll();
+               qtw->close();
+               return 0;
+           }else{
+               CurrentTableModel->setData(CurrentTableModel->index(0,4), old_text);
+               CurrentTableModel->submitAll();
+               qtw->close();
+               return 0;
+           }
+       }
+
+    }
+    if(column == "Пара"){
+        CurrentTableModel->setFilter(QString("id = '%1'").arg(id));//Type
+
+        CurrentTableModel->setData(CurrentTableModel->index(0,0), newText);
+        CurrentTableModel->submitAll();
 
 
-            QString Auditory = CurrentTableModel->data(CurrentTableModel->index(0, 5),0).toString();
-            QString Subject = CurrentTableModel->data(CurrentTableModel->index(0, 2),0).toString();
-            QString OtherAuditory = GroupScheduleModel->data(GroupScheduleModel->index(0, 5),0).toString();
-            QString OtherSubject = GroupScheduleModel->data(GroupScheduleModel->index(0, 2),0).toString();
-            if(Auditory == OtherAuditory && Subject == OtherSubject){
-                //обьединение
-            }else if(Auditory != OtherAuditory && Subject == OtherSubject){
-                QMessageBox msg;  msg.warning(this, "Ошибка", "Данного преподавателя нет в базе данных");
-                return 0;
-            }else if(Auditory == OtherAuditory && Subject != OtherSubject){
-                QMessageBox msg;  msg.warning(this, "Ошибка", "Данного преподавателя нет в базе данных");
-                return 0;
-            }else{
-                QMessageBox msg;  msg.warning(this, "Ошибка", "Данного преподавателя нет в базе данных");
-                return 0;
+
+        QSqlTableModel *OtherModel = new QSqlTableModel(0, database);
+        OtherModel->setTable(TableName);
+        OtherModel->select();
+
+        QString Auditor= CurrentTableModel->data(CurrentTableModel->index(0, 5),0).toString();
+        QString Teacher= CurrentTableModel->data(CurrentTableModel->index(0, 4),0).toString();
+
+        QSqlTableModel *OtherModel_1 = new QSqlTableModel(0, database);
+        OtherModel_1->setTable(TableName);
+        OtherModel_1->select();
+
+
+
+
+        OtherModel->setFilter("Para = '" + newText +
+                              "' and UpDown = '" + CurrentTableModel->data(CurrentTableModel->index( 0 , 1), 0).toString() +
+                              "' and Day = '" + CurrentTableModel->data(CurrentTableModel->index( 0 , 7), 0).toString() +
+                              "' and Groupe = '" + CurrentTableModel->data(CurrentTableModel->index( 0 , 6), 0).toString() +
+                              "' and id <>'"+QString::number(id)+"'");
+
+
+
+
+        if(OtherModel->rowCount()>=1){
+            for(int i=0;i<OtherModel->rowCount();i++){
+                OtherModel->setData(OtherModel->index(i,0),"");
             }
 
 
+
+            if(Auditor!=""){
+                OtherModel_1->setFilter("Para = '" + newText +
+                                          "' and UpDown = '" + CurrentTableModel->data(CurrentTableModel->index( 0 , 1), 0).toString() +
+                                          "' and Auditor = '" + Auditor +
+                                          "' and Day = '" + CurrentTableModel->data(CurrentTableModel->index( 0 , 7), 0).toString() +
+                                          "'");
+
+                if(OtherModel_1->rowCount()>1){
+                    QMessageBox msg;
+                    msg.warning(this, "Ошибка", "Аудитория №" + Auditor +" занята на " + newText + " паре");
+                    CurrentTableModel->setData(CurrentTableModel->index(0,0), old_text);
+                    CurrentTableModel->submitAll();
+                    return 0;
+                }
+            }else if(Teacher!=""){
+                OtherModel_1->setFilter("Para = '" + newText +
+                                      "' and UpDown = '" + CurrentTableModel->data(CurrentTableModel->index( 0 , 1), 0).toString() +
+                                      "' and Teacher = '" + Teacher +
+                                      "' and Day = '" + CurrentTableModel->data(CurrentTableModel->index( 0 , 7), 0).toString()+
+                                      "'");
+
+                if(OtherModel_1->rowCount()>1){
+                    QMessageBox msg;
+                    msg.warning(this, "Ошибка", "Преподаватель " + Teacher +" занят на " + newText + " паре");
+                    CurrentTableModel->setData(CurrentTableModel->index(0,0), old_text);
+                    CurrentTableModel->submitAll();
+                    return 0;
+                }
+            }
+
+
+
+
+
+
+            QTableView *qtw= new QTableView();
+            qtw->setModel(OtherModel);
+            qtw->show();
+
+
+            QMessageBox::StandardButton reply;
+            reply = QMessageBox::question(this, "Внимание", "Освободить пары, указанные в открывшейся таблице?",
+                                          QMessageBox::Yes|QMessageBox::No);
+            if (reply == QMessageBox::Yes) {
+
+
+                qtw->close();
+                return 1;
+            }else{
+                for(int i=0;i<OtherModel->rowCount();i++){
+                    OtherModel->setData(OtherModel->index(i,0),newText);
+                }
+                CurrentTableModel->setData(CurrentTableModel->index(0,0), old_text);
+                CurrentTableModel->submitAll();
+                qtw->close();
+                return 0;
+            }
         }else{
-            //add/update
+            if(Auditor!=""){
+                OtherModel_1->setFilter("Para = '" + newText +
+                                          "' and UpDown = '" + CurrentTableModel->data(CurrentTableModel->index( 0 , 1), 0).toString() +
+                                          "' and Auditor = '" + Auditor +
+                                          "' and Day = '" + CurrentTableModel->data(CurrentTableModel->index( 0 , 7), 0).toString() +
+                                          "'");
+
+                if(OtherModel_1->rowCount()>1){
+                    QMessageBox msg;
+                    msg.warning(this, "Ошибка", "Аудитория №" + Auditor +" занята на " + newText + " паре");
+                    CurrentTableModel->setData(CurrentTableModel->index(0,0), old_text);
+                    CurrentTableModel->submitAll();
+                    return 0;
+                }
+            }else if(Teacher!=""){
+                OtherModel_1->setFilter("Para = '" + newText +
+                                      "' and UpDown = '" + CurrentTableModel->data(CurrentTableModel->index( 0 , 1), 0).toString() +
+                                      "' and Teacher = '" + Teacher +
+                                      "' and Day = '" + CurrentTableModel->data(CurrentTableModel->index( 0 , 7), 0).toString()
+                                      +"'");
+
+                if(OtherModel_1->rowCount()>1){
+                    QMessageBox msg;
+                    msg.warning(this, "Ошибка", "Преподаватель " + Teacher +" занят на " + newText + " паре");
+                    CurrentTableModel->setData(CurrentTableModel->index(0,0), old_text);
+                    CurrentTableModel->submitAll();
+                    return 0;
+                }
+            }
         }
 
-
-
-        //проверка не занят ли препод
-            //не занят - вставляем и обновляем
-            //если совпадает предмет и аудитория, то обединяем и обновляем (ВОПРОС)
-            //занят -ошибка
-
-
+        return 1;
 
     }
-    if(column == "Аудитория"){
-        InfoAuditor->setFilter(QString("Number = '%1'").arg(newText));
-        if(InfoAuditor->rowCount() > 1){
-            //cell = QMessageBox !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-            FormChoice *fs = new FormChoice(InfoAuditor);
-            fs->show();
-            connect(fs, SIGNAL(closed(QString)), this, SLOT(searchClosed(QString)));
-            QEventLoop SignalWaitLoop;
-            connect(fs, SIGNAL(closed(QString)), &SignalWaitLoop, SLOT(quit()));
-            SignalWaitLoop.exec();
-
-
-            qDebug() << searchResult;
-
-        }
-        else if (InfoAuditor->rowCount()==0) {
-            QMessageBox msg;
-            msg.warning(this, "Ошибка", "Данного преподавателя нет в базе данных");
-            return 0;
-        }
-
-        //проверка не занят ли аудитория
-            //не занят - вставляем и обновляем
-            //если совпадает предмет и преподаватель, то обединяем и обновляем (ВОПРОС)
-            //занят -ошибка
-
-    }
-    //if(column == "Группа"){ }
-
-
-
-
-    /*
-    QTableView *qtw= new QTableView();
-    qtw->setModel(InfoSubject);
-    qtw->show();
-*/
 
     return 1;
 }
 
 
-QSqlTableModel* GroupTableDrop::Soul_Relationship(QSqlTableModel *CurrentTableModel){
-    qDebug() << "Made Relationship with Soul @Михаил";
-
-    QSqlTableModel *GroupScheduleModel = new QSqlTableModel(0, database);
-
-
-    qDebug() << "TableName " << TableName;
-    if (TableName == "GroupSchedule"){
-        qDebug() <<CurrentTableModel->data(CurrentTableModel->index( 0 , 4), 0).toString() << "!=''";
-        qDebug() <<CurrentTableModel->data(CurrentTableModel->index( 0 , 5), 0).toString() << "!=''";
-        if (CurrentTableModel->data(CurrentTableModel->index( 0 , 4), 0).toString()!="" or
-                CurrentTableModel->data(CurrentTableModel->index( 0 , 5), 0).toString()!=""){
-            GroupScheduleModel->setTable("Schedule");//GroupScheduleModel == Schedule!!!!!!!!!!!
-        }else{
-            return nullptr;
-        }
-
-    }else{
-        if (CurrentTableModel->data(CurrentTableModel->index( 0 , 6), 0).toString()!=""){
-            GroupScheduleModel->setTable("GroupSchedule");
-        }
-        else{
-            return nullptr;
-        }
-    }
-    GroupScheduleModel->select();
-
-    return GroupScheduleModel;
-}
-
 void GroupTableDrop::searchClosed(QString string){
     searchResult = string;
 }
 
-
-/*
-QModelIndex index;
-QString cell;
-for(int i=0; i<InfoSubject->rowCount(); i++){
-    index = InfoSubject->index(i, 1);
-    cell = InfoSubject->data(index, 0).toString();
-}
-*/

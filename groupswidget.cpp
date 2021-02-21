@@ -22,42 +22,7 @@ void GroupsWidget::Reload(){
         TabAr[i]->setFixedHeight(TabAr[i]->rowHeight(0)*(TabAr[i]->model()->rowCount()+1));
 
     }
-        ///////////////////////////////////////////////////////////////////
-        /*
-        // for(int i=0; i<6; i++)
-             if(ModelAr[i]->rowCount() < PARA_COUNT) {//empty table
-                 int ex = PARA_COUNT - ModelAr[i]->rowCount();
 
-                 qDebug() << "Here" << ModelAr[i]->rowCount() << ex;
-                 for(int j = 0; j<ex; j++) {
-                     ModelAr[i]->insertRow(ModelAr[i]->rowCount());
-
-                     int Curr_row = ModelAr[i]->rowCount()-1;
-
-                     QModelIndex _index = ModelAr[i]->index(Curr_row, 0);
-                     ModelAr[i]->setData(_index, j+1+PARA_COUNT-ex);
-
-                     _index = ModelAr[i]->index(Curr_row, 1);
-
-                     if (comboWeek->currentText()=="Верхняя")
-                         ModelAr[i]->setData(_index, 1);
-                     else ModelAr[i]->setData(_index, 0);
-
-                     _index = ModelAr[i]->index(Curr_row, 6);
-
-                     ModelAr[i]->setData(_index, comboGroup->currentText());
-
-                     _index = ModelAr[i]->index(Curr_row, 7);
-
-                     ModelAr[i]->setData(_index, QsAr[i]);
-
-                     ModelAr[i]->submitAll();
-                 }
-             }
-             */
-
-    //comboGroup->setModel(GModel);
-    //comboGroup->setModelColumn(1);
 }
 
 void GroupsWidget::searchClosed(QString filter){
@@ -80,7 +45,6 @@ void GroupsWidget::searchClicked(bool checked){
 GroupsWidget::GroupsWidget(QSqlDatabase database) : _database(database)
 {
 
-//////////////////////////////////
 
     groupWidget = new QGroupBox("Группы");
     QGridLayout *qll = new QGridLayout();
@@ -103,7 +67,6 @@ GroupsWidget::GroupsWidget(QSqlDatabase database) : _database(database)
     comboGroup->setModelColumn(1);
 
     connect(comboGroup, SIGNAL(currentTextChanged(QString)), this, SLOT(currentGroupChanged(QString)));
-
 
 
     //Week up/down
@@ -131,6 +94,7 @@ GroupsWidget::GroupsWidget(QSqlDatabase database) : _database(database)
 
     for(int i=0; i<6; i++)
     TabAr[i]->setFixedHeight(TabAr[i]->rowHeight(0)*(TabAr[i]->model()->rowCount()+1));
+    Reload();
 
 
 }
@@ -192,68 +156,6 @@ void GroupsWidget::AddTable(QGridLayout *qll, QSqlDatabase _database){
 
 void GroupsWidget::on_addButton_click(){
 
-    /*
-    for(int i=0; i<6; i++)
-       if(addButton[i] == QObject::sender()){
-            QModelIndex ind;
-
-           for(int j=1; j<9; j++){
-               //qDebug() << ModelAr[i]->data(ModelAr[i]->index(j,0), 0).toInt() << "Привет Андрей";
-
-               QSqlTableModel *q = ModelAr[i];
-
-               qDebug() << QString::number(j) << "Пока Андрей";
-               q->setFilter("Para = '" + QString::number(j) +
-                                     "' and UpDown = '" + q->data(q->index( j, 1), 0).toString() +
-                                     "' and Day = '" + q->data(q->index( j, 7), 0).toString() +
-                                     "' and Groupe like ('%" + q->data(q->index( j, 6), 0).toString() +
-                                     "%')");
-
-
-
-
-
-               if(q->rowCount() == 0){
-                   ModelAr[i]->insertRow(ModelAr[i]->rowCount());
-
-                   ind = ModelAr[i]->index(ModelAr[i]->rowCount()-1, 0);
-                   ModelAr[i]->setData(ind, j);
-                   ind = ModelAr[i]->index(ModelAr[i]->rowCount()-1, 2);
-                   ModelAr[i]->setData(ind, "");
-                   ind = ModelAr[i]->index(ModelAr[i]->rowCount()-1, 3);
-                   ModelAr[i]->setData(ind, "");
-                   ind = ModelAr[i]->index(ModelAr[i]->rowCount()-1, 4);
-                   ModelAr[i]->setData(ind, "");
-                   ind = ModelAr[i]->index(ModelAr[i]->rowCount()-1, 5);//
-                   ModelAr[i]->setData(ind, "");
-                   //8 = id
-                   ind = ModelAr[i]->index(ModelAr[i]->rowCount()-1, 9);
-                   ModelAr[i]->setData(ind, "");
-                   ind = ModelAr[i]->index(ModelAr[i]->rowCount()-1, 10);
-                   ModelAr[i]->setData(ind, "");
-
-                   ind = ModelAr[i]->index(ModelAr[i]->rowCount()-1, 1);
-                   if(comboWeek->currentText()=="Верхняя")
-                       ModelAr[i]->setData(ind, "1");
-                   else
-                       ModelAr[i]->setData(ind, "0");
-
-                   ind = ModelAr[i]->index(ModelAr[i]->rowCount()-1, 6);
-                   ModelAr[i]->setData(ind, comboGroup->currentText());
-
-                   ind = ModelAr[i]->index(ModelAr[i]->rowCount()-1, 7);
-                   ModelAr[i]->setData(ind, QsAr[i]);
-
-                   ModelAr[i]->submitAll();
-
-                Reload();
-               }
-
-           }
-
-       }
-*/
-
     for(int i=0; i<6; i++){
        if(addButton[i] == QObject::sender()){
 
@@ -290,27 +192,12 @@ void GroupsWidget::on_addButton_click(){
 
            currentGroupChanged(comboGroup->currentText());
        }
-
-
     }
-       //TabAr[i]->setFixedHeight(TabAr[i]->rowHeight(0)*(TabAr[i]->model()->rowCount()+1));
 
 }
 
 void GroupsWidget::currentGroupChanged(const QString &text){
-    TableChanged();
-/*
-    for(int i=0; i<6; i++){
-        ModelAr[i]->submitAll();//ModelAr[i]
-
-        if(comboWeek->currentText() == "Нижняя")
-           ModelAr[i]->setFilter(QString("Groupe = '%1' AND UpDown = '0' AND Day ='%2'").arg(text).arg(QsAr[i]));
-        else
-            ModelAr[i]->setFilter(QString("Groupe = '%1' AND UpDown = '1' AND Day ='%2'").arg(text).arg(QsAr[i]));
-
-        ModelAr[i]->select();
-   }
-   */
+   TableChanged();
 }
 
 void GroupsWidget::currentWeakChanged(const QString &text){

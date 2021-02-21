@@ -1,9 +1,6 @@
 #include "formsearch.h"
 #include "ui_formsearch.h"
 
-/*
-❤❤❤❤❤❤❤❤❤❤❤❤🐱‍👤🐱‍👤🐱‍👤🐱‍👤🐱‍👤💋👏🤳🤳🤳
-*/
 FormSearch::FormSearch(QSqlTableModel *_model, QWidget *parent) :
     QWidget(parent),
     model(_model),
@@ -14,8 +11,6 @@ FormSearch::FormSearch(QSqlTableModel *_model, QWidget *parent) :
     this->setWindowModality(Qt::ApplicationModal);
 
     qDebug() << "h2";
-
-    //view = new QTableView();
 
     ui->tableView->setModel(model);
     ui->tableView->setColumnHidden(0, true);
@@ -33,15 +28,6 @@ FormSearch::~FormSearch()
 void FormSearch::on_textEdit_textChanged()
 {
 
-    /*
-    QString in_str = ui->textEdit->toPlainText();
-    QString curr_col = model->headerData(1, Qt::Horizontal, Qt::DisplayRole).toString();
-    model->setFilter(QString("%1 like ('\%%2\%')").arg(ColumnName).arg(in_str));
-
-    ui->tableView->setModel(model);
-    ui->tableView->setColumnHidden(0, false);
-
-    */
     QString in_str = ui->textEdit->toPlainText();
     QStringList stringList;
        for(int i = 0; i < model->rowCount(); i++)
@@ -56,7 +42,6 @@ void FormSearch::on_textEdit_textChanged()
 
 
     QStringListModel *strmo = new QStringListModel(result);
-    //tbv = new QTableView();
     ui->tableView->setModel(strmo);
     ui->tableView->setColumnHidden(0, false);
 

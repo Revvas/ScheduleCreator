@@ -24,13 +24,6 @@
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout">
-    <item row="0" column="2">
-     <widget class="QPushButton" name="updateButton">
-      <property name="text">
-       <string>Обновить</string>
-      </property>
-     </widget>
-    </item>
     <item row="0" column="0">
      <spacer name="horizontalSpacer">
       <property name="orientation">
@@ -44,7 +37,7 @@
       </property>
      </spacer>
     </item>
-    <item row="0" column="4" colspan="2">
+    <item row="0" column="3" colspan="2">
      <widget class="QComboBox" name="comboBox">
       <property name="minimumSize">
        <size>
@@ -92,7 +85,7 @@
       </item>
      </widget>
     </item>
-    <item row="0" column="3">
+    <item row="0" column="2">
      <widget class="QPushButton" name="addButton">
       <property name="minimumSize">
        <size>
@@ -105,7 +98,14 @@
       </property>
      </widget>
     </item>
-    <item row="1" column="0" colspan="6">
+    <item row="0" column="1">
+     <widget class="QPushButton" name="updateButton">
+      <property name="text">
+       <string>Обновить</string>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="0" colspan="5">
      <widget class="QMdiArea" name="mdiArea">
       <property name="verticalScrollBarPolicy">
        <enum>Qt::ScrollBarAsNeeded</enum>
@@ -117,9 +117,6 @@
        <bool>true</bool>
       </property>
      </widget>
-    </item>
-    <item row="0" column="1">
-     <widget class="QSpinBox" name="spinBox"/>
     </item>
    </layout>
   </widget>
